@@ -1,22 +1,39 @@
-
-name: Polaris SAST Scan
+name: Polaris Scan
 
 on:
   push:
     branches:
       - main
+      - master
+      - develop
+      - stage
+      - release
   pull_request:
+    branches:
+      - main
+      - master
+      - develop
+      - stage
+      - release
+  workflow_dispatch: {}
 
 jobs:
-  polaris_scan:
+  scan:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
 
-      - name: Run Polaris Scan
-        uses: synopsys-sig/polaris-action@v1
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Polaris Scan
+        id: polaris-scan
+        uses: blackduck-inc/black-duck-security-scan@v2
         with:
-          server_url: ${{ secrets.POLARIS_URL }}
-          access_token: ${{ secrets.POLARIS_ACCESS_TOKEN }}
-          cli_scan_json_file: .synopsys/polaris/cli-scan.json
+          polaris_server_url: ${{ vars.POLARIS_URL }}
+          polaris_access_token: ${{ secrets.POLARIS_ACCESS_TOKEN }}
+          polaris_assessment_types: "SCA,SAST"
+          polaris_local: false
+          polaris_waitForScan: true
+          mark_build_status: failure
+          include_diagnostics: false
+          polaris_prComment_enabled: false
