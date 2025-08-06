@@ -1,1 +1,22 @@
 
+name: Polaris SAST Scan
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  polaris_scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Run Polaris Scan
+        uses: synopsys-sig/polaris-action@v1
+        with:
+          server_url: ${{ secrets.POLARIS_URL }}
+          access_token: ${{ secrets.POLARIS_ACCESS_TOKEN }}
+          cli_scan_json_file: .synopsys/polaris/cli-scan.json
